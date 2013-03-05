@@ -2,9 +2,12 @@ package columnize
 
 import "testing"
 
-// func assert_equal(a, b int, errmsg msg) {
-//	t.Errorf(
-// }
+func check_columnize(expect string, data []string, opts Opts_t, t *testing.T) {
+	got := Columnize(data, opts)
+	if expect != got  {
+		t.Errorf("got:\n%s\nwant:\n%s\n", got, expect)
+	}
+}
 
 func TestColumnize(t *testing.T) {
 	bools := []bool{true, false}
@@ -14,17 +17,20 @@ func TestColumnize(t *testing.T) {
 			t.Errorf("Cell size mismatch; got %d, want %d", got, 3)
 		}
         }
+
  	var opts Opts_t
 	Default_options(&opts)
 
 	data := []string{"1", "2", "3"}
 
-	expect := "1, 2, 3\n"
 	opts.Colsep = ", "
 	opts.Displaywidth = 10
-	got := Columnize(data, opts)
-	if expect != got  {
-		t.Errorf("got:\n%s\nwant:\n%s\n", got, expect)
-	}
+	check_columnize("1, 2, 3\n", data, opts, t)
 
+	data = []string{"1", "2", "3", "4"}
+	opts.Colsep = "  "
+	opts.Displaywidth = 4
+	check_columnize("1  3\n2  4\n", data, opts, t)
+	opts.Arrange_vertical = false
+	check_columnize("1  2\n3  4\n", data, opts, t)
 }
