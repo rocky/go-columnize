@@ -18,8 +18,7 @@ func TestColumnize(t *testing.T) {
 		}
         }
 
- 	var opts Opts_t
-	Default_options(&opts)
+	opts := Default_options()
 
 	data := []string{"1", "2", "3"}
 

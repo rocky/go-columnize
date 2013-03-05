@@ -46,7 +46,8 @@ type Opts_t struct {
     Term_adjust      bool
 }
 
-func Default_options(opts *Opts_t) {
+func Default_options() Opts_t {
+	var opts Opts_t
 	opts.Arrange_array    = false
 	opts.Arrange_vertical = true
 	opts.Array_prefix     = ""
@@ -56,6 +57,7 @@ func Default_options(opts *Opts_t) {
 	opts.Lineprefix       = ""
 	opts.Ljustify         = true
 	opts.Term_adjust      = false
+	return opts
 }
 
 // Return the length of String +cell+. If Boolean +term_adjust+ is true,

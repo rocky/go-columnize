@@ -5,8 +5,7 @@ import (
 )
 
 func main() {
- 	var opts columnize.Opts_t
-	columnize.Default_options(&opts)
+	opts := columnize.Default_options()
 	
  	// line = 'require [1;29m"[0m[1;37mirb[0m[1;29m"[0m';
  	line := "testing"
