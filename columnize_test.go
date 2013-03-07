@@ -3,7 +3,7 @@ package columnize
 import "testing"
 
 func check_columnize(expect string, data []string, opts Opts_t, t *testing.T) {
-	got := Columnize(data, opts)
+	got := ColumnizeS(data, opts)
 	if expect != got  {
 		t.Errorf("got:\n%s\nwant:\n%s\n", got, expect)
 	}

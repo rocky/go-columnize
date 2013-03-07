@@ -17,23 +17,26 @@
 // * the line prefix
 // * whether to ignore terminal codes in text size calculation
 // * whether to left justify text instead of right justify
+// * Array prefix
+// * Array suffix
+// * whether to format as an array. This is really a combination of setting
+//   the Array prefix, Array suffix, the line prefix and the column separator
+//   
 //
 // == License 
 //
 // Columnize is copyright (C) 2013 Rocky Bernstein
 // <rocky@gnu.org>
 //
-// All rights reserved.  You can redistribute and/or modify it under
-// the same terms as Ruby.
+// Copyright 2013 Rocky Bernstein.
 //
-// Adapted from the routine of the same name in Python +cmd.py+.
+// Adapted from the routine of the same name from Ruby.
 
 package columnize
 
-import (
-	"fmt"
-)
-	
+import "fmt"
+import "reflect"
+
 type Opts_t struct {
     Arrange_array    bool
     Arrange_vertical bool
@@ -71,6 +74,29 @@ func max(a, b int) int {
 	return b
 }
 
+// The following two routines are from Carlos Castillo. Thanks Carlos! 
+// http://play.golang.org/p/bxdcIj6ueH
+// This only works (no panic) if x is value which
+// has a length, and can be indexed (a slice/array)
+func ToStringArray(x interface{}) []string {
+	v := reflect.ValueOf(x)
+	out := make([]string, v.Len())
+	for i := range out {
+		out[i] = fmt.Sprint(v.Index(i).Interface())
+	}
+	return out
+}
+
+// This version works as above for slices/arrays, and
+// treats anything else as a single item
+func ToStringArray2(x interface{}) []string {
+	v := reflect.ValueOf(x)
+	if v.Kind() != reflect.Array && v.Kind() != reflect.Slice {
+		return []string{fmt.Sprint(x)}
+	}
+	return ToStringArray(x)
+}
+
 
 // Return a list of strings with embedded newlines (\n) as a compact
 // set of columns arranged horizontally or vertically.
@@ -89,7 +115,12 @@ func max(a, b int) int {
 // will go across, left to right, top to bottom.
 
 
-func Columnize(list [] string, opts Opts_t) string {
+func Columnize(list interface{}, opts Opts_t) string {
+	l := ToStringArray2(list)
+	return ColumnizeS(l, opts)
+}
+
+func ColumnizeS(list [] string, opts Opts_t) string {
 	if len(list) == 0 { 
 		result :=
 			fmt.Sprintf("%s%s", 
@@ -97,15 +128,10 @@ func Columnize(list [] string, opts Opts_t) string {
 		return result
 	}
 
-    l := make([] string, len(list))
-	for i:= 0; i<len(list); i++ {
-		l[i] = fmt.Sprintf("%s", list[i])
-	}
-
 	if len(list) == 1 { 
 		result := 
 			fmt.Sprintf("%s%s%s", 
-			opts.Array_prefix, l[0], opts.Array_suffix)
+			opts.Array_prefix, list[0], opts.Array_suffix)
 		return result
 	}
 	if opts.Displaywidth - len(opts.Lineprefix) < 4 {
@@ -131,7 +157,7 @@ func Columnize(list [] string, opts Opts_t) string {
 				for row := 0; row < nrows; row++ {
 					i := array_index(nrows, row, col)
 					if i >= len(list) { break }
-					colwidth = max(Cell_size(l[i], opts.Term_adjust),
+					colwidth = max(Cell_size(list[i], opts.Term_adjust),
 					               colwidth)
 					}
 				colwidths = append(colwidths, colwidth)
@@ -159,7 +185,7 @@ func Columnize(list [] string, opts Opts_t) string {
 				if i >= len(list) {
 					x = ""
 				} else {
-					x = l[i]
+					x = list[i]
 				}
 				texts = append(texts, x)
 			}
@@ -209,7 +235,7 @@ func Columnize(list [] string, opts Opts_t) string {
 					for row = 1; row <= nrows; row++ {
 						i = array_index(ncols, row, col)
 						if i >= len(list) {	break }
-						colwidth = max(colwidth, Cell_size(l[i], opts.Term_adjust))
+						colwidth = max(colwidth, Cell_size(list[i], opts.Term_adjust))
 					}
 					colwidths = append(colwidths, colwidth)
 					totwidth += colwidth + len(opts.Colsep)
@@ -250,7 +276,7 @@ func Columnize(list [] string, opts Opts_t) string {
 				if i >= len(list) {
 					break
 				} else {
-					x = l[i]
+					x = list[i]
 				}
 				texts = append(texts, x)
 			}
