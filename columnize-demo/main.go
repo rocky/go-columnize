@@ -9,8 +9,8 @@ func main() {
 	
  	// line = 'require [1;29m"[0m[1;37mirb[0m[1;29m"[0m';
  	line := "testing"
- 	fmt.Println(columnize.Cell_size(line, true))
- 	fmt.Println(columnize.Cell_size(line, false))
+ 	fmt.Println(columnize.CellSize(line, true))
+ 	fmt.Println(columnize.CellSize(line, false))
 
 	list := make([] string, 0)
  	fmt.Println(columnize.Columnize(list, opts))

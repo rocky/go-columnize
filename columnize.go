@@ -2,9 +2,10 @@
 // On printing the string the columns are aligned.
 //
 // == Summary
-// Display a list of strings as a compact set of columns.
+// Format a simple (i.e. not nested) slice into aligned columns. 
+// A string with embedded newline characters is returned.
 //
-//   For example, for a line width of 4 characters (arranged vertically):
+// For example, for a line width of 4 characters (arranged vertically):
 //        ['1', '2,', '3', '4'] => '1  3\n2  4\n'
 //   
 //    or arranged horizontally:
@@ -12,15 +13,14 @@
 //        
 // Each column is only as wide as necessary.  By default, columns are
 // separated by two spaces. Options are avalable for setting
-// * the display width
-// * the column separator
-// * the line prefix
-// * whether to ignore terminal codes in text size calculation
-// * whether to left justify text instead of right justify
-// * Array prefix
-// * Array suffix
-// * whether to format as an array. This is really a combination of setting
-//   the Array prefix, Array suffix, the line prefix and the column separator
+//  * `DisplayWidth`:  the display width (`int`)
+//  * `Colsep: the column separator (`string`)
+//  * `Lineprefix`: the line prefix (`string`)
+//  * `LJustify`: whether to left justify text instead of right justify (`bool`)
+//  * `ArrayPrefix`: string to prefix the entire list with (`string`)
+//  * `ArraySuffix` : string to suffix the entire list with (`string`)
+//  * `LinePrefix`: string to add after each newline (`string`)
+//  * `ArrangeArray`: whether to format as an array. This is really a combination of setting the `ArrayPrefix`, `ArraySuffix`, the `LinePrefix` and the `ColSep`
 //   
 //
 // == License 
@@ -38,34 +38,34 @@ import "fmt"
 import "reflect"
 
 type Opts_t struct {
-    Arrange_array    bool
-    Arrange_vertical bool
-    Array_prefix     string
-    Array_suffix     string
-    Colsep           string
-    Displaywidth     int
-    Lineprefix       string
-    Ljustify         bool
-    Term_adjust      bool
+    ArrangeArray    bool
+    ArrangeVertical bool
+    ArrayPrefix     string
+    ArraySuffix     string
+    ColSep          string
+    DisplayWidth    int
+    LinePrefix      string
+    LJustify        bool
+    TermAdjust      bool
 }
 
 func Default_options() Opts_t {
 	var opts Opts_t
-	opts.Arrange_array    = false
-	opts.Arrange_vertical = true
-	opts.Array_prefix     = ""
-	opts.Array_suffix     = ""
-	opts.Colsep           = "  "
-	opts.Displaywidth     = 80
-	opts.Lineprefix       = ""
-	opts.Ljustify         = true
-	opts.Term_adjust      = false
+	opts.ArrangeArray    = false
+	opts.ArrangeVertical = true
+	opts.ArrayPrefix     = ""
+	opts.ArraySuffix     = ""
+	opts.ColSep          = "  "
+	opts.DisplayWidth    = 80
+	opts.LinePrefix      = ""
+	opts.LJustify        = true
+	opts.TermAdjust      = false
 	return opts
 }
 
 // Return the length of String +cell+. If Boolean +term_adjust+ is true,
 // ignore terminal sequences in +cell+.
-func Cell_size(cell string, term_adjust bool) int {
+func CellSize(cell string, term_adjust bool) int {
 	return len(cell)
 }
 
@@ -124,24 +124,24 @@ func ColumnizeS(list [] string, opts Opts_t) string {
 	if len(list) == 0 { 
 		result :=
 			fmt.Sprintf("%s%s", 
-			opts.Array_prefix, opts.Array_suffix)
+			opts.ArrayPrefix, opts.ArraySuffix)
 		return result
 	}
 
 	if len(list) == 1 { 
 		result := 
 			fmt.Sprintf("%s%s%s", 
-			opts.Array_prefix, list[0], opts.Array_suffix)
+			opts.ArrayPrefix, list[0], opts.ArraySuffix)
 		return result
 	}
-	if opts.Displaywidth - len(opts.Lineprefix) < 4 {
-		opts.Displaywidth = len(opts.Lineprefix)+ 4
+	if opts.DisplayWidth - len(opts.LinePrefix) < 4 {
+		opts.DisplayWidth = len(opts.LinePrefix)+ 4
 	} else {
-		opts.Displaywidth -= len(opts.Lineprefix)
+		opts.DisplayWidth -= len(opts.LinePrefix)
 	}
 	var ncols, nrows int
 	var colwidths [] int
-	if opts.Arrange_vertical {
+	if opts.ArrangeVertical {
 		array_index := func(num_rows, row, col int) int  {
 	 		return num_rows*col + row 
 	 	}
@@ -149,7 +149,7 @@ func ColumnizeS(list [] string, opts Opts_t) string {
 		for nrows = 1; nrows < len(list); nrows++ {
 			ncols = (len(list) + nrows-1) / nrows
 			colwidths = make([] int, 0)
-			totwidth := -len(opts.Colsep)
+			totwidth := -len(opts.ColSep)
 			
 			for col := 0; col < ncols; col++ {
 				// get max column width for this column
@@ -157,17 +157,17 @@ func ColumnizeS(list [] string, opts Opts_t) string {
 				for row := 0; row < nrows; row++ {
 					i := array_index(nrows, row, col)
 					if i >= len(list) { break }
-					colwidth = max(Cell_size(list[i], opts.Term_adjust),
+					colwidth = max(CellSize(list[i], opts.TermAdjust),
 					               colwidth)
 					}
 				colwidths = append(colwidths, colwidth)
-				totwidth += colwidth + len(opts.Colsep)
-				if totwidth > opts.Displaywidth {
+				totwidth += colwidth + len(opts.ColSep)
+				if totwidth > opts.DisplayWidth {
 					ncols = col
 					break
 				}
 			}
-			if totwidth <= opts.Displaywidth {
+			if totwidth <= opts.DisplayWidth {
 				break 
 			}
 		}
@@ -194,7 +194,7 @@ func ColumnizeS(list [] string, opts Opts_t) string {
 				for col := 0; col < len(texts); col++ {
 					if ncols != 1  {
 						var fmt_str string
-						if opts.Ljustify {
+						if opts.LJustify {
 							fmt_str = fmt.Sprintf("%%%ds", -colwidths[col])
 							texts[col] = fmt.Sprintf(fmt_str, texts[col])
 						} else {
@@ -205,7 +205,7 @@ func ColumnizeS(list [] string, opts Opts_t) string {
 				}
 				line := ""
 				for i := 0; i <len(texts)-1; i++ {
-					line += fmt.Sprintf("%s%s", texts[i], opts.Colsep)
+					line += fmt.Sprintf("%s%s", texts[i], opts.ColSep)
 				}
 				if len(texts) > 0 {
 					line += fmt.Sprintf("%s\n", texts[len(texts)-1])
@@ -228,31 +228,31 @@ func ColumnizeS(list [] string, opts Opts_t) string {
 			for nrows = min_rows; nrows <= (len(list)); nrows++ {
 				rounded_size = nrows * ncols
 				colwidths = [] int { }
-				totwidth = -len(opts.Colsep)
+				totwidth = -len(opts.ColSep)
 				var colwidth, row int
 				for col := 0; col < ncols; col++ {
 					// get max column width for this column
 					for row = 1; row <= nrows; row++ {
 						i = array_index(ncols, row, col)
-						if i >= len(list) {	break }
-						colwidth = max(colwidth, Cell_size(list[i], opts.Term_adjust))
+						if i >= len(list) { break }
+						colwidth = max(colwidth, CellSize(list[i], opts.TermAdjust))
 					}
 					colwidths = append(colwidths, colwidth)
-					totwidth += colwidth + len(opts.Colsep)
-					if totwidth > opts.Displaywidth { break };
+					totwidth += colwidth + len(opts.ColSep)
+					if totwidth > opts.DisplayWidth { break };
 				}
-				if totwidth <= opts.Displaywidth {
+				if totwidth <= opts.DisplayWidth {
 					// Found the right nrows and ncols
 					nrows  = row
 					break
 				} else { 
-					if totwidth > opts.Displaywidth {
+					if totwidth > opts.DisplayWidth {
 						// Need to reduce ncols
 						break
 					}
 				}
 			}
-			if totwidth <= opts.Displaywidth && i >= rounded_size-1 {
+			if totwidth <= opts.DisplayWidth && i >= rounded_size-1 {
 				break
 			}
 		}
@@ -263,10 +263,10 @@ func ColumnizeS(list [] string, opts Opts_t) string {
 		// each of the rows.
 		s := ""
 		var prefix string
-		if len(opts.Array_prefix) == 0 {
-            prefix = opts.Lineprefix 
+		if len(opts.ArrayPrefix) == 0 {
+            prefix = opts.LinePrefix 
         } else {
-            prefix =  opts.Array_prefix
+            prefix =  opts.ArrayPrefix
         }
 		for row := 1; row <=nrows; row++ {
 			texts := make([] string, 0)
@@ -283,7 +283,7 @@ func ColumnizeS(list [] string, opts Opts_t) string {
 			for col := 0; col < len(texts); col++ {
 				if ncols != 1  {
 					var fmt_str string
-					if opts.Ljustify {
+					if opts.LJustify {
 						fmt_str = fmt.Sprintf("%%%ds", -colwidths[col])
 						texts[col] = fmt.Sprintf(fmt_str, texts[col])
 					} else {
@@ -294,15 +294,15 @@ func ColumnizeS(list [] string, opts Opts_t) string {
 			}
 			line := prefix
 			for i := 0; i <len(texts)-1; i++ {
-				line += fmt.Sprintf("%s%s", texts[i], opts.Colsep)
+				line += fmt.Sprintf("%s%s", texts[i], opts.ColSep)
 			}
 			if len(texts) > 0 {
 				line += fmt.Sprintf("%s\n", texts[len(texts)-1])
 			}
 			s += line
-			prefix = opts.Lineprefix
+			prefix = opts.LinePrefix
 		}
-		s += opts.Array_suffix
+		s += opts.ArraySuffix
 		return s
 	}
 	return "Not reached"
