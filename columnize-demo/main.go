@@ -45,24 +45,24 @@ func main() {
 	 	"twentytwo", "twentythree", "twentyfour",
 	 	"twentyfive","twentysix",   "twentyseven"}
 
-	opts.Arrange_vertical = true
+	opts.ArrangeVertical = true
 	fmt.Println(columnize.ColumnizeS(data, opts))
-	opts.Displaywidth = 50
-	opts.Ljustify = false
+	opts.DisplayWidth = 50
+	opts.LJustify = false
 	fmt.Println(columnize.ColumnizeS(data, opts))
 
-	opts.Arrange_vertical = true
+	opts.ArrangeVertical = true
  	fmt.Println(columnize.ColumnizeS(data, opts))
-	opts.Displaywidth = 80
-	opts.Ljustify = true
+	opts.DisplayWidth = 80
+	opts.LJustify = true
 	fmt.Println(columnize.ColumnizeS(data, opts))
 
 	a := []int{31, 4, 1, 59, 2, 6, 5, 3}
-	// opts.Arrange_array = true
-	opts.Arrange_vertical = false
-	opts.Ljustify = false
+	// opts.ArrangeArray = true
+	opts.ArrangeVertical = false
+	opts.LJustify = false
 
-	opts.Displaywidth = 8
+	opts.DisplayWidth = 8
 	fmt.Println(columnize.Columnize(a, opts))
 
 }
