@@ -129,8 +129,7 @@ func ToStringSlice(x interface{}, opt_fmt ...string) []string {
     Arranged horizontally:
       opts := columnize.Default_options()
       opts.arrange_vertical = false
-      columnize.Columnize(a) => 
-        ['1', '2,', '3', '4'] => '1  2\n3  4\n'
+      columnize.Columnize(a) =>  '1  2\n3  4\n'
         
  Each column is only as wide as necessary.  By default, columns are
  separated by two spaces. Options are avalable for setting
