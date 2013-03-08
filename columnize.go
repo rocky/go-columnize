@@ -4,23 +4,8 @@
 // == Summary
 // Format a simple (i.e. not nested) slice into aligned columns. 
 // A string with embedded newline characters is returned.
+// See documentation for Columnize.columnize below.
 //
-// For example, for a line width of 4 characters (arranged vertically):
-//        ['1', '2,', '3', '4'] => '1  3\n2  4\n'
-//   
-//    or arranged horizontally:
-//        ['1', '2,', '3', '4'] => '1  2\n3  4\n'
-//        
-// Each column is only as wide as necessary.  By default, columns are
-// separated by two spaces. Options are avalable for setting
-//  * `DisplayWidth`:  the display width (`int`)
-//  * `Colsep: the column separator (`string`)
-//  * `Lineprefix`: the line prefix (`string`)
-//  * `LJustify`: whether to left justify text instead of right justify (`bool`)
-//  * `ArrayPrefix`: string to prefix the entire list with (`string`)
-//  * `ArraySuffix` : string to suffix the entire list with (`string`)
-//  * `LinePrefix`: string to add after each newline (`string`)
-//  * `ArrangeArray`: whether to format as an array. This is really a combination of setting the `ArrayPrefix`, `ArraySuffix`, the `LinePrefix` and the `ColSep`
 //   
 //
 // == License 
@@ -42,6 +27,7 @@ type Opts_t struct {
     ArrangeVertical bool
     ArrayPrefix     string
     ArraySuffix     string
+    CellFmt         string
     ColSep          string
     DisplayWidth    int
     LinePrefix      string
@@ -55,6 +41,7 @@ func Default_options() Opts_t {
 	opts.ArrangeVertical = true
 	opts.ArrayPrefix     = ""
 	opts.ArraySuffix     = ""
+	opts.CellFmt         = ""
 	opts.ColSep          = "  "
 	opts.DisplayWidth    = 80
 	opts.LinePrefix      = ""
@@ -74,52 +61,101 @@ func max(a, b int) int {
 	return b
 }
 
-// The following two routines are from Carlos Castillo. Thanks Carlos! 
-// http://play.golang.org/p/bxdcIj6ueH
-// This only works (no panic) if x is value which
-// has a length, and can be indexed (a slice/array)
-func ToStringArray(x interface{}) []string {
+/* 
+
+The following routines ToStringArrayFromIndexable and ToStringArray are
+from Carlos Castillo. Thanks Carlos!
+http://play.golang.org/p/bxdcIj6ueH
+
+   ToStringSliceFromIndexable(slice_or_array, [format_string]) => [] string
+
+Run fmt.Sprint on each of the elemnts in slice_or_array. If
+format_string is given, that is the format string passed to fmt.Sprintf.
+
+This routine assumes slice_or_array is a value which has a length,
+and can be indexed (a slice/array). No checking on or error is thrown
+if this is not the case.
+
+*/
+func ToStringSliceFromIndexable(x interface{}, opt_fmt ...string) []string {
 	v := reflect.ValueOf(x)
 	out := make([]string, v.Len())
 	for i := range out {
-		out[i] = fmt.Sprint(v.Index(i).Interface())
+		if 0 == len(opt_fmt) {
+			out[i] = fmt.Sprint(v.Index(i).Interface())
+		} else {
+			out[i] = fmt.Sprintf(opt_fmt[0], v.Index(i).Interface())
+		}
 	}
 	return out
 }
 
-// This version works as above for slices/arrays, and
-// treats anything else as a single item
-func ToStringArray2(x interface{}) []string {
+/* 
+
+ToStringSlice(data, [format_string]) => [] string
+
+If data is a slice or array, runs
+ToStringSliceFromIndexable. Otherwise, data is put into a slice and
+ToStringSliceFromIndexable is called on that slice of one element.
+
+*/
+func ToStringSlice(x interface{}, opt_fmt ...string) []string {
 	v := reflect.ValueOf(x)
 	if v.Kind() != reflect.Array && v.Kind() != reflect.Slice {
-		return []string{fmt.Sprint(x)}
+		// Not an array or slice, so run fmt.Sprint and turn that
+		// single item into a slice.
+		if 0 == len(opt_fmt) {
+			return []string{fmt.Sprint(x)}
+		} else {
+			return []string{fmt.Sprintf(opt_fmt[0], x)}
+		}
 	}
-	return ToStringArray(x)
+	if 0 == len(opt_fmt) {
+		return ToStringSliceFromIndexable(x)
+	}
+	return ToStringSliceFromIndexable(x, opt_fmt[0])
 }
 
 
-// Return a list of strings with embedded newlines (\n) as a compact
-// set of columns arranged horizontally or vertically.
-//
-// For example, for a line width of 4 characters (arranged vertically):
-//     ['1', '2,', '3', '4'] => '1  3\n2  4\n'
-	
-// or arranged horizontally:
-//     ['1', '2,', '3', '4'] => '1  2\n3  4\n'
-//     
-// Each column is only as wide as possible, no larger than
-// +displaywidth'.  If +list+ is not an array, the empty string, '',
-// is returned. By default, columns are separated by two spaces - one
-// was not legible enough. Set +colsep+ to adjust the string separate
-// columns. If +arrange_vertical+ is set false, consecutive items
-// will go across, left to right, top to bottom.
+/* 
+ Return a string from an array with embedded newlines formatted so
+ that when printed the columns are aligned.
 
+ For example:, for a line width of 4 characters (arranged vertically):
 
+     a = [] int{1,2,4,4}
+    columnize.Columnize(a) => '1  3\n2  4\n'
+
+    Arranged horizontally:
+      opts := columnize.Default_options()
+      opts.arrange_vertical = false
+      columnize.Columnize(a) => 
+        ['1', '2,', '3', '4'] => '1  2\n3  4\n'
+        
+ Each column is only as wide as necessary.  By default, columns are
+ separated by two spaces. Options are avalable for setting
+  * `DisplayWidth`:  the display width (`int`)
+  * `CellFmt: format string to pass to fmt.Sprintf in converting array items to a string
+  * `Colsep: the column separator (`string`)
+  * `Lineprefix`: the line prefix (`string`)
+  * `LJustify`: whether to left justify text instead of right justify (`bool`)
+  * `ArrayPrefix`: string to prefix the entire list with (`string`)
+  * `ArraySuffix` : string to suffix the entire list with (`string`)
+  * `LinePrefix`: string to add after each newline (`string`)
+  * `ArrangeArray`: whether to format as an array. This is really a combination of setting the `ArrayPrefix`, `ArraySuffix`, the `LinePrefix` and the `ColSep`
+
+*/
 func Columnize(list interface{}, opts Opts_t) string {
-	l := ToStringArray2(list)
+	var l []string
+	if opts.CellFmt != "" {
+		l = ToStringSlice(list, opts.CellFmt)
+	} else {
+		l = ToStringSlice(list)
+	}
 	return ColumnizeS(l, opts)
 }
 
+// Like Columnize but we are already passed a slice of string
 func ColumnizeS(list [] string, opts Opts_t) string {
 	if len(list) == 0 { 
 		result :=
