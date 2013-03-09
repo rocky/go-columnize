@@ -2,6 +2,7 @@ package columnize
 
 import "testing"
 
+
 func check_columnize(expect string, data []string, opts Opts_t, t *testing.T) {
 	got := ColumnizeS(data, opts)
 	if expect != got  {
@@ -9,10 +10,19 @@ func check_columnize(expect string, data []string, opts Opts_t, t *testing.T) {
 	}
 }
 
+// type KeyValuePair_t struct {
+// 	Field    string
+// 	Value   interface{}
+// }
+
+// func set_opts(pair []KeyValuePair_t, opts *Opts_t) {
+// 	range
+// }
+
 func TestColumnize(t *testing.T) {
 	bools := []bool{true, false}
-	for i := 0; i < len(bools); i++ {
-		got := CellSize("abc", bools[i])
+	for _, b := range bools {
+		got := CellSize("abc", b)
 		if 3 != got  {
 			t.Errorf("Cell size mismatch; got %d, want %d", got, 3)
 		}
