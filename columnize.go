@@ -35,20 +35,63 @@ type Opts_t struct {
     TermAdjust      bool
 }
 
-func Default_options() Opts_t {
-	var opts Opts_t
-	opts.ArrangeArray    = false
-	opts.ArrangeVertical = true
-	opts.ArrayPrefix     = ""
-	opts.ArraySuffix     = ""
-	opts.CellFmt         = ""
-	opts.ColSep          = "  "
-	opts.DisplayWidth    = 80
-	opts.LinePrefix      = ""
-	opts.LJustify        = true
-	opts.TermAdjust      = false
+func DefaultOptions() Opts_t {
+	opts := Opts_t{
+		ArrangeArray: false,
+		ArrangeVertical: true,
+		ArrayPrefix: "",
+		ArraySuffix: "",
+		CellFmt: "",
+		ColSep:  "  ",
+		DisplayWidth: 80,
+		LinePrefix:   "",
+		LJustify:     true,
+		TermAdjust:   false,
+	}
 	return opts
 }
+
+type KeyValuePair_t struct {
+	Field    string
+	Value   interface{}
+}
+
+func SetOptions(pairs ... KeyValuePair_t) Opts_t {
+	opts := DefaultOptions()
+	for _, pair := range pairs {
+		switch pair.Field {
+		case "ArrangeArray":
+			v, _ := pair.Value.(bool)
+			opts.ArrangeArray = v
+		case "ArrangeVertical":
+			v, _ := pair.Value.(bool)
+			opts.ArrangeVertical = v
+		case "ArrayPrefix":
+			v, _ := pair.Value.(string)
+			opts.ArrayPrefix = v
+		case "ArraySuffix":
+			v, _ := pair.Value.(string)
+			opts.ArraySuffix = v
+		case "CellFmt":
+			v, _ := pair.Value.(string)
+			opts.CellFmt = v
+		case "ColSep":
+			v, _ := pair.Value.(string)
+			opts.ColSep = v
+		case "DisplayWidth":
+			v, _ := pair.Value.(int)
+			opts.DisplayWidth = v
+		case "LJustify":
+			v, _ := pair.Value.(bool)
+			opts.LJustify = v
+		case "TermAdjust":
+			v, _ := pair.Value.(bool)
+			opts.TermAdjust = v
+		}
+	}
+	return opts
+}
+
 
 // Return the length of String +cell+. If Boolean +term_adjust+ is true,
 // ignore terminal sequences in +cell+.

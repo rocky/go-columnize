@@ -10,15 +10,6 @@ func check_columnize(expect string, data []string, opts Opts_t, t *testing.T) {
 	}
 }
 
-// type KeyValuePair_t struct {
-// 	Field    string
-// 	Value   interface{}
-// }
-
-// func set_opts(pair []KeyValuePair_t, opts *Opts_t) {
-// 	range
-// }
-
 func TestColumnize(t *testing.T) {
 	bools := []bool{true, false}
 	for _, b := range bools {
@@ -28,12 +19,12 @@ func TestColumnize(t *testing.T) {
 		}
         }
 
-	opts := Default_options()
+	vv := KeyValuePair_t{Field: "DisplayWidth", Value: 10}
+	opts := SetOptions(vv)
 
 	data := []string{"1", "2", "3"}
 
 	opts.ColSep = ", "
-	opts.DisplayWidth = 10
 	check_columnize("1, 2, 3\n", data, opts, t)
 
 	data = []string{"1", "2", "3", "4"}
