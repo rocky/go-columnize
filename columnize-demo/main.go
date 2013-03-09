@@ -5,7 +5,7 @@ import (
 )
 
 func main() {
-	opts := columnize.Default_options()
+	opts := columnize.DefaultOptions()
 	
  	// line = 'require [1;29m"[0m[1;37mirb[0m[1;29m"[0m';
  	line := "testing"
@@ -56,6 +56,7 @@ func main() {
 	opts.DisplayWidth = 80
 	opts.LJustify = true
 	fmt.Println(columnize.ColumnizeS(data, opts))
+	fmt.Println("----------------")
 
 	a := []int{31, 4, 1, 59, 2, 6, 5, 3}
 	// opts.ArrangeArray = true
@@ -63,6 +64,10 @@ func main() {
 	opts.LJustify = false
 
 	opts.DisplayWidth = 8
+	fmt.Println(columnize.Columnize(a, opts))
+	fmt.Println("----------------")
+
+	opts.ArrangeArray = true
 	fmt.Println(columnize.Columnize(a, opts))
 
 }

@@ -31,6 +31,7 @@ type Opts_t struct {
     ColSep          string
     DisplayWidth    int
     LinePrefix      string
+    LineSuffix      string
     LJustify        bool
     TermAdjust      bool
 }
@@ -45,6 +46,7 @@ func DefaultOptions() Opts_t {
 		ColSep:  "  ",
 		DisplayWidth: 80,
 		LinePrefix:   "",
+		LineSuffix:   "\n",
 		LJustify:     true,
 		TermAdjust:   false,
 	}
@@ -91,7 +93,6 @@ func SetOptions(pairs ... KeyValuePair_t) Opts_t {
 	}
 	return opts
 }
-
 
 // Return the length of String +cell+. If Boolean +term_adjust+ is true,
 // ignore terminal sequences in +cell+.
@@ -199,6 +200,16 @@ func Columnize(list interface{}, opts Opts_t) string {
 
 // Like Columnize but we are already passed a slice of string
 func ColumnizeS(list [] string, opts Opts_t) string {
+
+	if opts.ArrangeArray {
+		opts.ArrayPrefix = "["
+		opts.ArraySuffix = "]\n"
+		opts.LinePrefix  = " "
+		opts.LineSuffix  = ",\n"
+		opts.ColSep      = ", "
+		opts.ArrangeVertical = false
+	}
+
 	if len(list) == 0 { 
 		result :=
 			fmt.Sprintf("%s%s", 
@@ -286,7 +297,7 @@ func ColumnizeS(list [] string, opts Opts_t) string {
 					line += fmt.Sprintf("%s%s", texts[i], opts.ColSep)
 				}
 				if len(texts) > 0 {
-					line += fmt.Sprintf("%s\n", texts[len(texts)-1])
+					line += fmt.Sprintf("%s%s", texts[len(texts)-1], opts.LineSuffix)
 				}
 				s += line
 			}
@@ -375,7 +386,7 @@ func ColumnizeS(list [] string, opts Opts_t) string {
 				line += fmt.Sprintf("%s%s", texts[i], opts.ColSep)
 			}
 			if len(texts) > 0 {
-				line += fmt.Sprintf("%s\n", texts[len(texts)-1])
+				line += fmt.Sprintf("%s%s", texts[len(texts)-1], opts.LineSuffix)
 			}
 			s += line
 			prefix = opts.LinePrefix
