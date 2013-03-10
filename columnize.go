@@ -1,18 +1,3 @@
-// Format a string array into a single string with embedded newlines.
-// On printing the string the columns are aligned.
-//
-// == Summary
-// Format a simple (i.e. not nested) slice into aligned columns. 
-// A string with embedded newline characters is returned.
-// See documentation for Columnize.columnize below.
-//
-//   
-//
-// == License 
-//
-// Columnize is copyright (C) 2013 Rocky Bernstein
-// <rocky@gnu.org>
-//
 // Copyright 2013 Rocky Bernstein.
 //
 // Adapted from the routine of the same name from Ruby.
@@ -94,8 +79,8 @@ func SetOptions(pairs ... KeyValuePair_t) Opts_t {
 	return opts
 }
 
-// Return the length of String +cell+. If Boolean +term_adjust+ is true,
-// ignore terminal sequences in +cell+.
+// Return the length of string cell. If Boolean term_adjust is true,
+// ignore terminal sequences in cell.
 func CellSize(cell string, term_adjust bool) int {
 	return len(cell)
 }
@@ -105,12 +90,12 @@ func max(a, b int) int {
 	return b
 }
 
+// The following routines ToStringArrayFromIndexable and ToStringArray are
+// from Carlos Castillo. Thanks Carlos!
+// http://play.golang.org/p/bxdcIj6ueH
+
+
 /* 
-
-The following routines ToStringArrayFromIndexable and ToStringArray are
-from Carlos Castillo. Thanks Carlos!
-http://play.golang.org/p/bxdcIj6ueH
-
    ToStringSliceFromIndexable(slice_or_array, [format_string]) => [] string
 
 Run fmt.Sprint on each of the elemnts in slice_or_array. If
@@ -119,7 +104,6 @@ format_string is given, that is the format string passed to fmt.Sprintf.
 This routine assumes slice_or_array is a value which has a length,
 and can be indexed (a slice/array). No checking on or error is thrown
 if this is not the case.
-
 */
 func ToStringSliceFromIndexable(x interface{}, opt_fmt ...string) []string {
 	v := reflect.ValueOf(x)
@@ -135,7 +119,6 @@ func ToStringSliceFromIndexable(x interface{}, opt_fmt ...string) []string {
 }
 
 /* 
-
 ToStringSlice(data, [format_string]) => [] string
 
 If data is a slice or array, runs
@@ -167,26 +150,17 @@ func ToStringSlice(x interface{}, opt_fmt ...string) []string {
 
  For example:, for a line width of 4 characters (arranged vertically):
 
-     a = [] int{1,2,4,4}
-    columnize.Columnize(a) => '1  3\n2  4\n'
+	a = [] int{1,2,4,4}
+	columnize.Columnize(a) => '1  3\n2  4\n'
 
-    Arranged horizontally:
-      opts := columnize.Default_options()
-      opts.arrange_vertical = false
-      columnize.Columnize(a) =>  '1  2\n3  4\n'
+Arranged horizontally:
+
+	opts := columnize.Default_options()
+	opts.arrange_vertical = false
+	columnize.Columnize(a) =>  '1  2\n3  4\n'
         
- Each column is only as wide as necessary.  By default, columns are
- separated by two spaces. Options are avalable for setting
-  * `DisplayWidth`:  the display width (`int`)
-  * `CellFmt: format string to pass to fmt.Sprintf in converting array items to a string
-  * `Colsep: the column separator (`string`)
-  * `Lineprefix`: the line prefix (`string`)
-  * `LJustify`: whether to left justify text instead of right justify (`bool`)
-  * `ArrayPrefix`: string to prefix the entire list with (`string`)
-  * `ArraySuffix` : string to suffix the entire list with (`string`)
-  * `LinePrefix`: string to add after each newline (`string`)
-  * `ArrangeArray`: whether to format as an array. This is really a combination of setting the `ArrayPrefix`, `ArraySuffix`, the `LinePrefix` and the `ColSep`
-
+Each column is only as wide as necessary.  By default, columns are
+separated by two spaces
 */
 func Columnize(list interface{}, opts Opts_t) string {
 	var l []string
