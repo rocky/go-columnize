@@ -36,4 +36,11 @@ func TestColumnize(t *testing.T) {
 	
 	opts.ArrangeVertical = false
 	check_columnize("1  2\n3  4\n", ndata, opts, t)
+
+	opts.ArrangeArray = true
+	check_columnize("[1, 2,\n 3, 4,\n ]\n", ndata, opts, t)
+
+	opts.DisplayWidth = 8
+	opts.CellFmt = "%02d"
+	check_columnize("[01, 02,\n 03, 04,\n ]\n", ndata, opts, t)
 }
