@@ -184,17 +184,23 @@ func ColumnizeS(list [] string, opts Opts_t) string {
 		opts.ArrangeVertical = false
 	}
 
+	var prefix string
+	if len(opts.ArrayPrefix) == 0 {
+		prefix = opts.LinePrefix
+	} else {
+		prefix =  opts.ArrayPrefix
+	}
 	if len(list) == 0 {
 		result :=
 			fmt.Sprintf("%s%s",
-			opts.ArrayPrefix, opts.ArraySuffix)
+			prefix, opts.ArraySuffix)
 		return result
 	}
 
 	if len(list) == 1 {
 		result :=
 			fmt.Sprintf("%s%s%s",
-			opts.ArrayPrefix, list[0], opts.ArraySuffix)
+			prefix, list[0], opts.ArraySuffix)
 		return result
 	}
 	if opts.DisplayWidth - len(opts.LinePrefix) < 4 {
