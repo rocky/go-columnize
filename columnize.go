@@ -85,8 +85,8 @@ func CellSize(cell string, term_adjust bool) int {
 	return len(cell)
 }
 
-func max(a, b int) int { 
-	if a > b {return a } 
+func max(a, b int) int {
+	if a > b {return a }
 	return b
 }
 
@@ -95,7 +95,7 @@ func max(a, b int) int {
 // http://play.golang.org/p/bxdcIj6ueH
 
 
-/* 
+/*
    ToStringSliceFromIndexable(slice_or_array, [format_string]) => [] string
 
 Run fmt.Sprint on each of the elemnts in slice_or_array. If
@@ -118,7 +118,7 @@ func ToStringSliceFromIndexable(x interface{}, opt_fmt ...string) []string {
 	return out
 }
 
-/* 
+/*
 ToStringSlice(data, [format_string]) => [] string
 
 If data is a slice or array, runs
@@ -144,7 +144,7 @@ func ToStringSlice(x interface{}, opt_fmt ...string) []string {
 }
 
 
-/* 
+/*
  Return a string from an array with embedded newlines formatted so
  that when printed the columns are aligned.
 
@@ -158,7 +158,7 @@ Arranged horizontally:
 	opts := columnize.Default_options()
 	opts.arrange_vertical = false
 	columnize.Columnize(a) =>  '1  2\n3  4\n'
-        
+
 Each column is only as wide as necessary.  By default, columns are
 separated by two spaces
 */
@@ -184,16 +184,16 @@ func ColumnizeS(list [] string, opts Opts_t) string {
 		opts.ArrangeVertical = false
 	}
 
-	if len(list) == 0 { 
+	if len(list) == 0 {
 		result :=
-			fmt.Sprintf("%s%s", 
+			fmt.Sprintf("%s%s",
 			opts.ArrayPrefix, opts.ArraySuffix)
 		return result
 	}
 
-	if len(list) == 1 { 
-		result := 
-			fmt.Sprintf("%s%s%s", 
+	if len(list) == 1 {
+		result :=
+			fmt.Sprintf("%s%s%s",
 			opts.ArrayPrefix, list[0], opts.ArraySuffix)
 		return result
 	}
@@ -206,14 +206,14 @@ func ColumnizeS(list [] string, opts Opts_t) string {
 	var colwidths [] int
 	if opts.ArrangeVertical {
 		array_index := func(num_rows, row, col int) int  {
-	 		return num_rows*col + row 
+	 		return num_rows*col + row
 	 	}
 		// Try every row count from 1 upwards
 		for nrows = 1; nrows < len(list); nrows++ {
 			ncols = (len(list) + nrows-1) / nrows
 			colwidths = make([] int, 0)
 			totwidth := -len(opts.ColSep)
-			
+
 			for col := 0; col < ncols; col++ {
 				// get max column width for this column
 				colwidth := 0
@@ -231,7 +231,7 @@ func ColumnizeS(list [] string, opts Opts_t) string {
 				}
 			}
 			if totwidth <= opts.DisplayWidth {
-				break 
+				break
 			}
 		}
 		if ncols < 1 {ncols = 1}
@@ -266,7 +266,7 @@ func ColumnizeS(list [] string, opts Opts_t) string {
 						}
 					}
 				}
-				line := ""
+				line := opts.LinePrefix
 				for i := 0; i <len(texts)-1; i++ {
 					line += fmt.Sprintf("%s%s", texts[i], opts.ColSep)
 				}
@@ -279,7 +279,7 @@ func ColumnizeS(list [] string, opts Opts_t) string {
 		return s
 	} else {
 		array_index := func(ncols, row, col int) int {
-			return ncols*(row-1) + col 
+			return ncols*(row-1) + col
 		}
 		// Assign to make enlarge scope of loop variables.
 		var totwidth, i, rounded_size int
@@ -308,7 +308,7 @@ func ColumnizeS(list [] string, opts Opts_t) string {
 					// Found the right nrows and ncols
 					nrows  = row
 					break
-				} else { 
+				} else {
 					if totwidth > opts.DisplayWidth {
 						// Need to reduce ncols
 						break
@@ -327,7 +327,7 @@ func ColumnizeS(list [] string, opts Opts_t) string {
 		s := ""
 		var prefix string
 		if len(opts.ArrayPrefix) == 0 {
-            prefix = opts.LinePrefix 
+            prefix = opts.LinePrefix
         } else {
             prefix =  opts.ArrayPrefix
         }
