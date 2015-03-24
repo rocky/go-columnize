@@ -1,5 +1,9 @@
 # Comments starting with #: below are remake GNU Makefile comments. See
 # https://github.com/rocky/remake/wiki/Rake-tasks-for-gnu-make
+#
+# Supplying a make file prevents travis from trying to build
+# using go get -t -v ../... which tries to build
+# demo code.
 
 .PHONY: all install check test
 
