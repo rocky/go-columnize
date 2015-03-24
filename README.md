@@ -32,7 +32,7 @@ fmt.Println(columnize.Columnize(data, opts)
 
 gives output:
 
-```go
+```
 1, 2
 3, 4
 ```
