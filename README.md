@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/rocky/go-columnize.png)](https://travis-ci.org/rocky/go-columnize) [![GoDoc](https://godoc.org/github.com/rocky/go-columnize?status.svg)
+[![Build Status](https://travis-ci.org/rocky/go-columnize.png)](https://travis-ci.org/rocky/go-columnize) [![GoDoc](https://godoc.org/github.com/rocky/go-columnize?status.svg)](https://godoc.org/github.com/rocky/go-columnize)
 
 A Go module to format a simple (i.e. not nested) slice into aligned
 columns. A string with embedded newline characters is returned.
