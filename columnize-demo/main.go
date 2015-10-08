@@ -1,12 +1,12 @@
 package main
 import (
-	"columnize"
+	"github.com/rocky/go-columnize"
 	"fmt"
 )
 
 func main() {
 	opts := columnize.DefaultOptions()
-	
+
  	// line = 'require [1;29m"[0m[1;37mirb[0m[1;29m"[0m';
  	line := "testing"
  	fmt.Println(columnize.CellSize(line, true))
@@ -17,7 +17,7 @@ func main() {
 	// for _, pair := [{4, 4}, {4, 7}, {100, 80}] {
 	// 	width, num = pair
 	// 	for i := 1;  i <= num; i++ {
-	// 		for _, pair := [{false 'horizontal'}, 
+	// 		for _, pair := [{false 'horizontal'},
         //                              {true, 'vertical'}] {
 	// 			bool, dir := pair
 	// 			opts[displaywidth] = width
@@ -30,7 +30,7 @@ func main() {
 	// }
 
  	// fmt.Println Columnize::columnize.Columnize(5)
- 	// fmt.Println columnize.Columnize(["a", 2, "c"], :displaywidth =>10, 
+ 	// fmt.Println columnize.Columnize(["a", 2, "c"], :displaywidth =>10,
         //                                 :colsep => ', ')
 	// fmt.Println columnize.Columnize(["oneitem"])
  	// fmt.Println columnize.Columnize(["one", "two", "three"])
